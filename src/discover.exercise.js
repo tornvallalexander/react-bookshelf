@@ -9,38 +9,37 @@ import {Input, BookListUL, Spinner} from './components/lib'
 import {BookRow} from './components/book-row'
 import {client} from './utils/api-client'
 import {pipeWithPromise} from './utils';
+import * as colors from 'styles/colors'
+import {useAsync} from './utils/hooks';
 
 function DiscoverBooksScreen() {
+  const {
+    run,
+    data,
+    error,
+    isLoading,
+    isError,
+    isSuccess,
+  } = useAsync()
   const [query, setQuery] = React.useState('')
-  const [status, setStatus] = React.useState('idle')
-  const [data, setData] = React.useState([])
   const [queried, setQueried] = React.useState(false)
-  const [error, setError] = React.useState('')
 
   React.useEffect(() => {
     (async () => {
       if (!queried) return;
       try {
-        setStatus('loading')
-        await pipeWithPromise(
+        run(pipeWithPromise(
           encodeURIComponent,
           appendURI,
           client,
-          setData
-        )(query)
-        setStatus('success')
+        )(query))
       } catch (err) {
         console.error(err)
-        setStatus('idle')
-        setError(err.message)
       } finally {
         setQueried(false)
       }
     })()
-  }, [queried, query]);
-
-  const isLoading = status === 'loading'
-  const isSuccess = status === 'success'
+  }, [queried, query, run]);
 
   function handleSearchSubmit(event) {
     event.preventDefault()
@@ -79,6 +78,15 @@ function DiscoverBooksScreen() {
         </Tooltip>
       </form>
 
+      {isError && (
+        <div css={{
+          color: colors.danger,
+        }}>
+          <p>There was an error:</p>
+          <pre>{error.message}</pre>
+        </div>
+      )}
+
       {isSuccess ? (
         data?.books?.length ? (
           <BookListUL css={{marginTop: 20}}>
@@ -92,7 +100,6 @@ function DiscoverBooksScreen() {
           <p>No books found. Try another search.</p>
         )
       ) : null}
-      {error && <p>{error}</p>}
     </div>
   )
 }
