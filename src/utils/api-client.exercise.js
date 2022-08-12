@@ -2,7 +2,20 @@
 import * as auth from 'auth-provider'
 const apiURL = process.env.REACT_APP_API_URL
 
-async function client(
+const deparallelize = (callbackfn) => {
+  const busy = new Map()
+  let current
+  return async (...args) => {
+    if (!busy.has(...args)) {
+      busy.set(...args, true)
+      const promise = callbackfn(...args)
+      current = promise.finally(() => busy.delete(...args))
+    }
+    return current
+  }
+}
+
+async function _client(
   endpoint,
   {data, token, headers: customHeaders, ...customConfig} = {},
 ) {
@@ -33,5 +46,7 @@ async function client(
     }
   })
 }
+
+const client = deparallelize(_client)
 
 export {client}
