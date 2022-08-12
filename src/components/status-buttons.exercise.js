@@ -51,10 +51,12 @@ function StatusButtons({user, book}) {
   // 🐨 call useQuery here to get the listItem (if it exists)
   // queryKey should be 'list-items'
   // queryFn should call the list-items endpoint
+  const {data: listItems} = useQuery({
+    queryKey: 'list-items',
+    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems)
+  })
 
-  // 🐨 search through the listItems you got from react-query and find the
-  // one with the right bookId.
-  const listItem = null
+  const listItem = listItems?.find(item => item.bookId === book.id) ?? null
 
   // 💰 for all the mutations below, if you want to get the list-items cache
   // updated after this query finishes the use the `onSettled` config option
@@ -68,14 +70,24 @@ function StatusButtons({user, book}) {
   // 🐨 call useMutation here and assign the mutate function to "remove"
   // the mutate function should call the list-items/:listItemId endpoint with a DELETE
 
-  // 🐨 call useMutation here and assign the mutate function to "create"
-  // the mutate function should call the list-items endpoint with a POST
-  // and the bookId the listItem is being created for.
+  const [remove] = useMutation(
+    ({id}) => client(`list-items/${id}`, {
+      method: 'DELETE',
+      token: user.token,
+    }),
+    {
+      onSettled: () => void queryCache.invalidateQueries('list-items'),
+    }
+  )
+
   const [create] = useMutation(
     ({bookId}) => client('list-items', {
       data: {bookId},
       token: user.token,
-    })
+    }),
+    {
+      onSettled: () => void queryCache.invalidateQueries('list-items'),
+    }
   )
 
   return (
@@ -105,7 +117,7 @@ function StatusButtons({user, book}) {
         <TooltipButton
           label="Remove from list"
           highlight={colors.danger}
-          // 🐨 add an onClick here that calls remove
+          onClick={() => remove({id: listItem.id})}
           icon={<FaMinusCircle />}
         />
       ) : (
