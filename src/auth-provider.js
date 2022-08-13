@@ -1,6 +1,8 @@
 // pretend this is firebase, netlify, or auth0's code.
 // you shouldn't have to implement something like this in your own app
 
+import {queryCache} from 'react-query';
+
 const localStorageKey = '__auth_provider_token__'
 
 async function getToken() {
@@ -25,6 +27,7 @@ function register({username, password}) {
 
 async function logout() {
   window.localStorage.removeItem(localStorageKey)
+  queryCache.clear()
 }
 
 // an auth provider wouldn't use your client, they'd have their own
