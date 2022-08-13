@@ -1,4 +1,4 @@
-import {useQuery, queryCache} from 'react-query'
+import {queryCache, useQuery} from 'react-query'
 import {client} from './api-client'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
 
