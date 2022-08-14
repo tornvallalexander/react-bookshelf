@@ -1,14 +1,21 @@
 import {queryCache, useMutation, useQuery} from 'react-query';
 import {client} from './api-client.exercise';
+import {setQueryDataForBook} from './books.exercise';
 
 const defaultMutationOptions = {
+  onError: (err, variables, recover) => recover?.(),
   onSettled: () => queryCache.invalidateQueries('list-items'),
 }
 
 function useListItems(user) {
   const {data: listItems} = useQuery({
     queryKey: 'list-items',
-    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems)
+    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems),
+    config: {
+      onSuccess: (items) => {
+        items.forEach(item => setQueryDataForBook(item.book))
+      }
+    }
   })
   return listItems ?? []
 }
@@ -25,7 +32,21 @@ function useUpdateListItem(user, options) {
       data: updates,
       token: user.token,
     }),
-    {...defaultMutationOptions, ...options}
+    {
+      onMutate: (newItem) => {
+        const previousItems = queryCache.getQueryData('list-items')
+
+        queryCache.setQueryData('list-items', old => {
+          return old.map(item => {
+            return item.id === newItem.id ? {...item, ...newItem} : item
+          })
+        })
+
+        return () => queryCache.setQueryData('list-items', previousItems)
+      },
+      ...defaultMutationOptions,
+      ...options
+    }
   )
 }
 
@@ -35,7 +56,19 @@ function useRemoveListItem(user, options) {
       method: 'DELETE',
       token: user.token,
     }),
-    {...defaultMutationOptions, ...options}
+    {
+      onMutate: (removedItem) => {
+        const previousItems = queryCache.getQueryData('list-items')
+
+        queryCache.setQueryData('list-items', old => {
+          return old.filter(item => item.id !== removedItem.id)
+        })
+
+        return () => queryCache.setQueryData('list-items', previousItems)
+      },
+      ...defaultMutationOptions,
+      ...options
+    }
   )
 }
 
