@@ -10,10 +10,7 @@ function useListItems(user) {
 }
 
 function useListItem(book, user) {
-  const {data: listItems} = useQuery({
-    queryKey: 'list-items',
-    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems)
-  })
+  const listItems = useListItems(user)
   return listItems?.find(item => item.bookId === book.id) ?? null
 }
 
