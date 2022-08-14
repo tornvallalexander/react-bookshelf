@@ -8,6 +8,7 @@ import {queryCache, useMutation} from 'react-query'
 import {client} from 'utils/api-client'
 import {FaStar} from 'react-icons/fa'
 import * as colors from 'styles/colors'
+import {useUpdateListItem} from '../utils/list-items.exercise';
 
 const visuallyHiddenCSS = {
   border: '0',
@@ -22,16 +23,7 @@ const visuallyHiddenCSS = {
 
 function Rating({listItem, user}) {
   const [isTabbing, setIsTabbing] = React.useState(false)
-  const [update] = useMutation(
-    ({id, rating}) => client(`list-items/${id}`, {
-      token: user.token,
-      data: {rating},
-      method: 'PUT',
-    }),
-    {
-      onSettled: () => queryCache.invalidateQueries('list-items')
-    }
-  )
+  const [update] = useUpdateListItem(user)
 
   React.useEffect(() => {
     function handleKeyDown(event) {

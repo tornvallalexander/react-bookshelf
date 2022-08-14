@@ -16,6 +16,7 @@ const loadingBooks = Array.from({length: 10}, (v, index) => ({
   ...loadingBook,
 }))
 
+
 function useBookSearch(query, user) {
   const result = useQuery({
     queryKey: ['bookSearch', {query}],

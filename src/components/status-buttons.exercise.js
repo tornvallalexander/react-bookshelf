@@ -15,6 +15,7 @@ import {client} from 'utils/api-client'
 import {useAsync} from 'utils/hooks'
 import * as colors from 'styles/colors'
 import {CircleButton, Spinner} from './lib'
+import {useCreateListItem, useListItem, useRemoveListItem, useUpdateListItem} from '../utils/list-items.exercise';
 
 function TooltipButton({label, highlight, onClick, icon, ...rest}) {
   const {isLoading, isError, error, run} = useAsync()
@@ -48,45 +49,11 @@ function TooltipButton({label, highlight, onClick, icon, ...rest}) {
 }
 
 function StatusButtons({user, book}) {
-  // 🐨 call useQuery here to get the listItem (if it exists)
-  // queryKey should be 'list-items'
-  // queryFn should call the list-items endpoint
-  const {data: listItems} = useQuery({
-    queryKey: 'list-items',
-    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems)
-  })
+  const listItem = useListItem(book, user)
 
-  const listItem = listItems?.find(item => item.bookId === book.id) ?? null
-
-  const [update] = useMutation(
-    ({id, finishDate}) => client(`list-items/${id}`, {
-      method: 'PUT',
-      data: {finishDate},
-      token: user.token,
-    }), {
-      onSettled: () => void queryCache.invalidateQueries('list-items'),
-    }
-  )
-
-  const [remove] = useMutation(
-    ({id}) => client(`list-items/${id}`, {
-      method: 'DELETE',
-      token: user.token,
-    }),
-    {
-      onSettled: () => void queryCache.invalidateQueries('list-items'),
-    }
-  )
-
-  const [create] = useMutation(
-    ({bookId}) => client('list-items', {
-      data: {bookId},
-      token: user.token,
-    }),
-    {
-      onSettled: () => void queryCache.invalidateQueries('list-items'),
-    }
-  )
+  const [update] = useUpdateListItem(user)
+  const [remove] = useRemoveListItem(user)
+  const [create] = useCreateListItem(user)
 
   return (
     <React.Fragment>
