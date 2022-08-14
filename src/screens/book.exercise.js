@@ -14,31 +14,14 @@ import * as colors from 'styles/colors'
 import {Textarea} from 'components/lib'
 import {Rating} from 'components/rating'
 import {StatusButtons} from 'components/status-buttons'
-import bookPlaceholderSvg from 'assets/book-placeholder.svg'
-
-const loadingBook = {
-  title: 'Loading...',
-  author: 'loading...',
-  coverImageUrl: bookPlaceholderSvg,
-  publisher: 'Loading Publishing',
-  synopsis: 'Loading...',
-  loadingBook: true,
-}
+import {useBook} from '../utils/books.exercise';
+import {useListItem} from '../utils/list-items.exercise';
 
 function BookScreen({user}) {
   const {bookId} = useParams()
 
-  const {data: book = loadingBook} = useQuery({
-    queryKey: ['book', {bookId}],
-    queryFn: () => client(`books/${bookId}`, {token: user.token}).then(data => data.book),
-  })
-
-  const {data: listItems} = useQuery({
-    queryKey: 'list-items',
-    queryFn: () => client('list-items', {token: user.token}).then(data => data.listItems)
-  })
-
-  const listItem = listItems?.find(item => item.bookId === book.id) ?? null
+  const {book} = useBook(bookId, user)
+  const listItem = useListItem(book, user)
 
   const {title, author, coverImageUrl, publisher, synopsis} = book
 
