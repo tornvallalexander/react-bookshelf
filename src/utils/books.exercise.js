@@ -3,6 +3,8 @@ import {useQuery, queryCache} from 'react-query'
 // 🐨 get AuthContext from context/auth-context
 import {client} from './api-client'
 import bookPlaceholderSvg from 'assets/book-placeholder.svg'
+import {useAuth} from '../context/auth-context.exercise';
+import * as React from 'react';
 
 const loadingBook = {
   title: 'Loading...',
@@ -18,8 +20,6 @@ const loadingBooks = Array.from({length: 10}, (v, index) => ({
   ...loadingBook,
 }))
 
-// 🦉 note that this is *not* treated as a hook and is instead called by other hooks
-// So we'll continue to accept the user here.
 const getBookSearchConfig = (query, user) => ({
   queryKey: ['bookSearch', {query}],
   queryFn: () =>
@@ -35,16 +35,14 @@ const getBookSearchConfig = (query, user) => ({
   },
 })
 
-// 💣 remove the user argument here
-function useBookSearch(query, user) {
-  // 🐨 get the user from React.useContext(AuthContext)
+function useBookSearch(query) {
+  const {user} = useAuth()
   const result = useQuery(getBookSearchConfig(query, user))
   return {...result, books: result.data ?? loadingBooks}
 }
 
-// 💣 remove the user argument here
-function useBook(bookId, user) {
-  // 🐨 get the user from React.useContext(AuthContext)
+function useBook(bookId) {
+  const {user} = useAuth()
   const {data} = useQuery({
     queryKey: ['book', {bookId}],
     queryFn: () =>
@@ -61,6 +59,15 @@ function useBook(bookId, user) {
 // 2. Returns a memoized callback (React.useCallback) version of this
 // refetchBookSearchQuery function. It should no longer need to accept user as
 // an argument and instead lists it as a dependency.
+function useRefetchBookSearchQuery() {
+  const {user} = useAuth()
+  return React.useCallback(
+    async () => {
+      queryCache.removeQueries('bookSearch')
+      await queryCache.prefetchQuery(getBookSearchConfig('', user))
+    }, [user]
+  )
+}
 async function refetchBookSearchQuery(user) {
   queryCache.removeQueries('bookSearch')
   await queryCache.prefetchQuery(getBookSearchConfig('', user))
@@ -75,4 +82,10 @@ function setQueryDataForBook(book) {
   queryCache.setQueryData(['book', {bookId: book.id}], book, bookQueryConfig)
 }
 
-export {useBook, useBookSearch, refetchBookSearchQuery, setQueryDataForBook}
+export {
+  useBook,
+  useBookSearch,
+  refetchBookSearchQuery,
+  setQueryDataForBook,
+  useRefetchBookSearchQuery,
+}
