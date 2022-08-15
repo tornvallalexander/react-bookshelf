@@ -6,12 +6,12 @@ import {ErrorBoundary} from 'react-error-boundary'
 import {Button, ErrorMessage, FullPageErrorFallback} from './components/lib'
 import * as mq from './styles/media-queries'
 import * as colors from './styles/colors'
-// 🐨 get AuthContext from ./context/auth-context
 import {ReadingListScreen} from './screens/reading-list'
 import {FinishedScreen} from './screens/finished'
 import {DiscoverBooksScreen} from './screens/discover'
 import {BookScreen} from './screens/book'
 import {NotFoundScreen} from './screens/not-found'
+import {useAuth} from './context/auth-context.exercise';
 
 function ErrorFallback({error}) {
   return (
@@ -28,10 +28,8 @@ function ErrorFallback({error}) {
   )
 }
 
-// you'll no longer receive the user object and logout function as props
-// 💣 remove the props
-function AuthenticatedApp({user, logout}) {
-  // 🐨 get user and logout function from AuthContext using useContext
+function AuthenticatedApp() {
+  const {user, logout} = useAuth()
   return (
     <ErrorBoundary FallbackComponent={FullPageErrorFallback}>
       <div
