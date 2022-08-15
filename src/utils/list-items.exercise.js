@@ -1,4 +1,3 @@
-import * as React from "react"
 import {useQuery, useMutation, queryCache} from 'react-query'
 import {setQueryDataForBook} from './books'
 import {client} from './api-client'
