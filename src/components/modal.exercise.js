@@ -1,23 +1,53 @@
 // 🐨 you're going to need the Dialog component
 // It's just a light wrapper around ReachUI Dialog
 // 📜 https://reacttraining.com/reach-ui/dialog/
-// import {Dialog} from './lib'
+import {Dialog} from './lib'
+import * as React from 'react';
 
-// 💰 Here's a reminder of how your components will be used:
-/*
-<Modal>
-  <ModalOpenButton>
-    <button>Open Modal</button>
-  </ModalOpenButton>
-  <ModalContents aria-label="Modal label (for screen readers)">
-    <ModalDismissButton>
-      <button>Close Modal</button>
-    </ModalDismissButton>
-    <h3>Modal title</h3>
-    <div>Some great contents of the modal</div>
-  </ModalContents>
-</Modal>
-*/
+const ModalContext = React.createContext()
+
+function useModal() {
+  const ctx = React.useContext(ModalContext)
+  if (ctx === undefined) {
+    throw new Error('useModal should only be used within a ModalContext provider')
+  }
+  return ctx
+}
+
+function Modal(props) {
+  const [isOpen, setIsOpen] = React.useState(false)
+  return <ModalContext.Provider value={{isOpen, setIsOpen}} {...props} />
+}
+
+function ModalDismissButton({children: child}) {
+  const {setIsOpen} = useModal()
+  return React.cloneElement(child, {
+    onClick: () => setIsOpen(false)
+  })
+}
+
+function ModalOpenButton({children: child}) {
+  const {setIsOpen} = useModal()
+  return React.cloneElement(child, {
+    onClick: () => setIsOpen(true)
+  })
+}
+
+function ModalContents(props) {
+  const {isOpen, setIsOpen} = useModal()
+  return <Dialog
+    isOpen={isOpen}
+    onDismiss={() => setIsOpen(false)}
+    {...props}
+  />
+}
+
+export {
+  Modal,
+  ModalDismissButton,
+  ModalOpenButton,
+  ModalContents,
+}
 
 // we need this set of compound components to be structurally flexible
 // meaning we don't have control over the structure of the components. But
