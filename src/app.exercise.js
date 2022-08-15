@@ -7,7 +7,6 @@ import {BrowserRouter as Router} from 'react-router-dom'
 import {FullPageSpinner, FullPageErrorFallback} from './components/lib'
 import {client} from './utils/api-client'
 import {useAsync} from './utils/hooks'
-// 🐨 import the AuthContext you created in ./context/auth-context
 import {AuthContext} from './context/auth-context.exercise';
 import {AuthenticatedApp} from './authenticated-app'
 import {UnauthenticatedApp} from './unauthenticated-app'
@@ -62,10 +61,10 @@ function App() {
       <AuthContext.Provider value={props}>
         {user ? (
           <Router>
-            <AuthenticatedApp {...props} />
+            <AuthenticatedApp />
           </Router>
         ) : (
-          <UnauthenticatedApp {...props} />
+          <UnauthenticatedApp />
         )}
       </AuthContext.Provider>
     )

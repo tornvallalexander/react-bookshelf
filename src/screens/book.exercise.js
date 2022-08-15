@@ -63,9 +63,7 @@ function BookScreen() {
               }}
             >
               {book.loadingBook ? null : (
-                <StatusButtons
-                  book={book}
-                />
+                <StatusButtons book={book} />
               )}
             </div>
           </div>
