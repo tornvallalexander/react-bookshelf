@@ -14,7 +14,7 @@ function sendProfileQueue() {
   return client('profile', {data: {queueToSend}})
 }
 
-function Profiler({phases, ...props}) {
+function Profiler({phases, metadata, ...props}) {
   function reportProfile(
     id,
     phase,
@@ -24,9 +24,9 @@ function Profiler({phases, ...props}) {
     commitTime,
     interactions,
   ) {
-    console.log(phase)
     if (!phases || phases.includes(phase)) {
       queue.push({
+        metadata,
         id,
         phase,
         actualDuration,
