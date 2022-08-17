@@ -47,20 +47,31 @@ test('adds auth token when a token is provided', async () => {
   void await client(endpoint, {token})
   expect(request.headers.get('Authorization')).toBe(`Bearer ${token}`)
 })
-// 🐨 create a fake token (it can be set to any string you want)
-// 🐨 create a "request" variable with let
-// 🐨 create a server handler to handle a test request you'll be making
-// 🐨 inside the server handler, assign "request" to "req" so we can use that
-//     to assert things later.
-//     💰 so, something like...
-//       async (req, res, ctx) => {
-//         request = req
-//         ... etc...
-//
-// 🐨 call the client with the token (note that it's async)
-// 🐨 verify that `request.headers.get('Authorization')` is correct (it should include the token)
 
-test.todo('allows for config overrides')
+test('allows for config overrides', async () => {
+  const endpoint = 'test-endpoint'
+  const mockResult = {mockValue: 'VALUE'}
+
+  let request
+
+  server.use(
+    rest.put(getFullURL(endpoint), async (req, res, ctx) => {
+      request = req
+      return res(ctx.json(mockResult))
+    })
+  )
+
+  const customConfig = {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'fake-type',
+    }
+  }
+
+  void await client(endpoint, customConfig)
+
+  expect(request.headers.get('Content-Type')).toBe('fake-type')
+})
 // 🐨 do a very similar setup to the previous test
 // 🐨 create a custom config that specifies properties like "mode" of "cors" and a custom header
 // 🐨 call the client with the endpoint and the custom config
