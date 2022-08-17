@@ -8,17 +8,9 @@ const apiURL = process.env.REACT_APP_API_URL
 jest.mock('react-query')
 jest.mock('auth-provider')
 
-beforeAll(() => {
-  server.listen()
-})
-
-afterAll(() => {
-  server.close()
-})
-
-afterEach(() => {
-  server.resetHandlers()
-})
+beforeAll(() => server.listen())
+afterAll(() => server.close())
+afterEach(() => server.resetHandlers())
 
 const getFullURL = endpoint => `${apiURL}/${endpoint}`
 
