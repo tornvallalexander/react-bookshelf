@@ -70,15 +70,23 @@ test('allows for config overrides', async () => {
 
   void await client(endpoint, customConfig)
 
-  expect(request.headers.get('Content-Type')).toBe('fake-type')
+  expect(request.headers.get('Content-Type')).toBe(customConfig.headers['Content-Type'])
 })
-// 🐨 do a very similar setup to the previous test
-// 🐨 create a custom config that specifies properties like "mode" of "cors" and a custom header
-// 🐨 call the client with the endpoint and the custom config
-// 🐨 verify the request had the correct properties
 
-test.todo(
-  'when data is provided, it is stringified and the method defaults to POST',
+test('when data is provided, it is stringified and the method defaults to POST', async () => {
+    const endpoint = 'test-endpoint'
+    const data = 'fake-data'
+
+    server.use(
+      rest.post(getFullURL(endpoint), async (req, res, ctx) => {
+        return res(ctx.json(req.body))
+      })
+    )
+
+    const res = await client(endpoint, {data})
+
+    expect(res).toBe(data)
+  }
 )
 // 🐨 create a mock data object
 // 🐨 create a server handler very similar to the previous ones to handle the post request
