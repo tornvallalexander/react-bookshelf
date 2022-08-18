@@ -1,7 +1,5 @@
-// 🐨 instead of React Testing Library, you'll use React Hooks Testing Library
-// import {renderHook, act} from '@testing-library/react'
-// 🐨 Here's the thing you'll be testing:
-// import {useAsync} from '../hooks'
+import {renderHook} from '@testing-library/react'
+import {useAsync} from '../hooks'
 
 // 💰 I'm going to give this to you. It's a way for you to create a promise
 // which you can imperatively resolve or reject whenever you want.
@@ -23,7 +21,22 @@
 // do stuff/make assertions you want to after the promise has resolved
 
 // 🐨 flesh out these tests
-test.todo('calling run with a promise which resolves')
+test('calling run with a promise which resolves', async () => {
+  const {result} = renderHook(() => useAsync())
+  expect(result.current).toEqual({
+    isIdle: true,
+    isLoading: false,
+    isError: false,
+    isSuccess: false,
+    setData: expect.any(Function),
+    setError: expect.any(Function),
+    error: null,
+    status: 'idle',
+    data: null,
+    run: expect.any(Function),
+    reset: expect.any(Function),
+  })
+})
 // 🐨 get a promise and resolve function from the deferred utility
 // 🐨 use renderHook with useAsync to get the result
 // 🐨 assert the result.current is the correct default state
