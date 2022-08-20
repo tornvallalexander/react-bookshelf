@@ -140,15 +140,32 @@ test('can specify an initial state', async () => {
 	expect(result.current).toEqual({
 		...defaultHookState,
 
-		status: 'resolved',
 		data: mockData,
+		status: 'resolved',
 
 		isIdle: false,
 		isSuccess: true,
 	})
 })
 
-test.todo('can set the data')
+test('can set the data', async () => {
+	const mockData = Symbol('resolved value')
+	const {result} = renderHook(() => useAsync())
+
+	await act(() => {
+		result.current.setData(mockData)
+	})
+
+	expect(result.current).toEqual({
+		...defaultHookState,
+
+		data: mockData,
+		status: 'resolved',
+
+		isIdle: false,
+		isSuccess: true,
+	})
+})
 // 💰 result.current.setData('whatever you want')
 
 test.todo('can set the error')
