@@ -1,6 +1,14 @@
 import {act, renderHook} from '@testing-library/react'
 import {useAsync} from '../hooks'
 
+beforeEach(() => {
+	jest.spyOn(console, 'error')
+})
+
+afterEach(() => {
+	console.error.mockRestore()
+})
+
 const deferred = () => {
 	let resolve, reject
 	const promise = new Promise((res, rej) => {
@@ -186,7 +194,20 @@ test('can set the error', async () => {
 	})
 })
 
-test.todo('No state updates happen if the component is unmounted while pending')
+test('No state updates happen if the component is unmounted while pending', async () => {
+	const {promise, resolve} = deferred()
+	const {result, unmount} = renderHook(() => useAsync())
+	let p
+	act(() => {
+		p = result.current.run(promise)
+	})
+	unmount()
+	await act(async () => {
+		resolve()
+		await p
+	})
+	expect(console.error).not.toHaveBeenCalled()
+})
 // 💰 const {result, unmount} = renderHook(...)
 // 🐨 ensure that console.error is not called (React will call console.error if updates happen when unmounted)
 
